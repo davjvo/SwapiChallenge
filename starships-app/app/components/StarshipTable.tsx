@@ -27,9 +27,13 @@ const StarshipTable: FC<StarshipTableProps> = ({ starships }) => (
                 </tr>
             ) : (
                 starships.map(ship => (
-                    <tr key={ship.uid} className="hover:bg-gray-100">
-                        <td className="border border-gray-300 px-4 py-2">{ship.name}</td>
-                        <td className="border border-gray-300 px-4 py-2">{ship.manufacturer}</td>
+                    <tr key={ship.uid} className="hover:bg-sky-700">
+                        <td className="border border-gray-300 px-4 py-2">
+                            {ship.name}
+                        </td>
+                        <td className="border border-gray-300 px-4 py-2">
+                            {ship.manufacturer}
+                        </td>
                     </tr>
                 ))
             )}

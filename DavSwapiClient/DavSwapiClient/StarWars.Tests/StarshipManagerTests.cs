@@ -1,32 +1,45 @@
 ﻿using Microsoft.Extensions.Options;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
 using StarWars.Domain.Config;
-using StarWars.Domain.DTOs.External;
-using StarWars.Domain.Interfaces.Caching;
-using StarWars.Infrastructure.Caching;
-using StarWars.Infrastructure.External;
 using StarWars.Infrastructure.Manager;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using StarWars.Tests.Mocks;
+using Bogus;
 
 namespace StarWars.Tests;
 
 [TestClass]
 public class StarshipManagerTests
 {
-    private Mock<ICacheService> _cacheMock;
-    private Mock<ISwapiClient> _swapiClientMock;
-    private IOptions<SwapiSettings> _settings;
     private StarshipManager _manager;
-
+    private readonly Faker _faker = new();
 
     [TestInitialize]
     public void Setup()
     {
-        _cacheMock = new Mock<ICacheService>();
-        _swapiClientMock = new Mock<ISwapiClient>();
-        _settings = Options.Create(new SwapiSettings { BaseUrl = "https://swapi.dev/api/", RetryCount = 3, RetryDelaySeconds = 1 });
-        _manager = new StarshipManager(_cacheMock.Object, _swapiClientMock.Object, _settings);
+        var cacheMock = new CacheServiceMock();
+        var swapiClientMock = new SwapiClientMock();
+        var settings = Options.Create(new SwapiSettings
+        {
+            BaseUrl = _faker.Random.String(), 
+            RetryCount = 3, 
+            RetryDelaySeconds = 1, 
+            TimeoutSeconds = 100
+        });
+        _manager = new StarshipManager(cacheMock, swapiClientMock, settings);
+    }
+    
+    [TestMethod]
+    public async Task GetAllAsync_ShouldReturnData()
+    {
+        var data = await _manager.GetAllAsync();
+        
+        Assert.IsNotNull(data);
+    }
+
+    [TestMethod]
+    public async Task GetManufacturers_ShouldReturnData()
+    {
+        var data = await _manager.GetManufacturers();
+        
+        Assert.IsNotNull(data);
     }
 }
